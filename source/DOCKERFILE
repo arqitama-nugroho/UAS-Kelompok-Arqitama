@@ -1,0 +1,19 @@
+FROM ubuntu:24.04
+
+# Install OpenSSH Server
+RUN apt-get update && apt-get install -y openssh-server && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/run/sshd
+
+# Option A: Key-based authentication (Recommended)
+RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
+COPY id_ed25519.pub /root/.ssh/authorized_keys
+RUN chmod 600 /root/.ssh/authorized_keys
+
+# Option B: Password authentication (Testing only)
+# RUN echo 'root:your_password' | chpasswd
+# RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+EXPOSE 22
+
+# Start SSH daemon in the foreground
+CMD ["/usr/sbin/sshd", "-D"]
