@@ -1,8 +1,8 @@
-# Build the image
-docker build -t my-ssh-container .
+SSH:
 
-# Run the container in the background
-docker run -d -p 2222:22 --name ssh-box my-ssh-container
+build:
+docker build -t my_ssh_image
+docker run -d -p 2222:2222 my_ssh_image
 
-run ssh:
-ssh -i ~/.ssh/id_ed25519 -p 2222 root@localhost
+login:
+ssh root@localhost -p 2222
