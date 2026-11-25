@@ -1,15 +1,18 @@
-mkdir temp
+mkdir -p temp
+cd temp
 
 fallocate -l 5M payload.bin
 head -c 5M /dev/urandom > payload.bin
 
-mkdir quarantine
-mv payload.bin quarantine
+cd ..
 
-mkdir backup
-tar -czf payload_backup.tar.gz /quarantine
+mkdir -p quarantine
+mv temp/payload.bin quarantine/
 
-rm payload.bin
+mkdir -p backup
+tar -czf ./backup/payload_backup.tar.gz -C ./quarantine .
 
-mkdir recovery
-tar -xvzf /backup/payload_backup.tar.gz /recovery
+rm -f ./quarantine/payload.bin
+
+mkdir -p recovery
+tar -xvzf ./backup/payload_backup.tar.gz -C ./recovery
