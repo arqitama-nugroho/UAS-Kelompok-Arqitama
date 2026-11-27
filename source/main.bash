@@ -1,15 +1,26 @@
-mkdir temp
+#!/usr/bin/env bash
+set -euo pipefail
 
-fallocate -l 5M payload.bin
-head -c 5M /dev/urandom > payload.bin
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/logger.bash"
 
-mkdir quarantine
-mv payload.bin quarantine
+RUN_DIR="${RUN_DIR:-$PWD}"
+EVIDENCE_DIR="${EVIDENCE_DIR:-/evidence}"
+mkdir -p "$RUN_DIR" "$EVIDENCE_DIR"
 
-mkdir backup
-tar -czf payload_backup.tar.gz /quarantine
+MAIN_LOG="$EVIDENCE_DIR/main.log"
+: > "$MAIN_LOG"
+exec > >(tee -a "$MAIN_LOG") 2>&1
 
-rm payload.bin
+step "Start main workflow in $RUN_DIR"
+cd "$RUN_DIR"
 
-mkdir recovery
-tar -xvzf /backup/payload_backup.tar.gz /recovery
+mkdir -p temp quarantine backup recovery
+head -c 5M /dev/urandom > temp/payload.bin
+mv temp/payload.bin quarantine/payload.bin
+tar -czf backup/payload_backup.tar.gz -C quarantine payload.bin
+rm -f quarantine/payload.bin
+tar -xzf backup/payload_backup.tar.gz -C recovery
+
+ls -lh quarantine backup recovery
+log OK "main.bash completed"

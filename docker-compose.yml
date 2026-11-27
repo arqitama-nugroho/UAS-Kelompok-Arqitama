@@ -1,5 +1,0 @@
-# Build the image
-docker build -t my-ssh-container .
-
-# Run the container in the background
-docker run -d -p 2222:22 --name ssh-box my-ssh-container
